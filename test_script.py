@@ -2,8 +2,6 @@ from collections import namedtuple
 
 from script import StatusLine
 from script import parse
-from script import is_deleted
-from script import is_unmerged
 
 Case = namedtuple("Case", ["line", "parsed_line", "deleted", "unmerged"])
 TEST_CASES = [
@@ -45,15 +43,15 @@ TEST_CASES = [
 ]
 
 def test_parse():
-    for line, parse_example, _, _ in TEST_CASES:
-        assert parse(line) == parse_example
+    for line, status_entry, _, _ in TEST_CASES:
+        assert parse(line) == status_entry
 
 
 def test_is_deleted():
-    for _, parsed_status, deleted, _ in TEST_CASES:
-        assert is_deleted(parsed_status.status) == deleted
+    for _, status_entry, deleted, _ in TEST_CASES:
+        assert status_entry.is_deleted() == deleted
 
 
 def test_is_unmerged():
-    for _, parsed_status, _, unmerged in TEST_CASES:
-        assert is_unmerged(parsed_status.status) == unmerged
+    for _, status_entry, _, unmerged in TEST_CASES:
+        assert status_entry.is_unmerged() == unmerged
