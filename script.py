@@ -15,8 +15,8 @@ DELETED_STATUSES = set([
 ])
 UNMERGED_STATUSES = set("DD|AA|UU|AU|UD|UA|DU".split("|"))
 
-_StatusLine = namedtuple("StatusLine", ["status", "orig_path", "path"])
-class StatusLine(_StatusLine):
+_StatusEntry = namedtuple("StatusEntry", ["status", "orig_path", "path"])
+class StatusEntry(_StatusEntry):
 
     """Represents one line of status when running 'git status'"""
     def is_deleted(self):
@@ -54,7 +54,7 @@ def parse(line):
     else:
         orig_path = " ".join(path_parts[0:arrow_separator_idx])
         path = " ".join(path_parts[arrow_separator_idx+1:])
-    return StatusLine(status, orig_path, path)
+    return StatusEntry(status, orig_path, path)
 
 
 if __name__ == "__main__":
