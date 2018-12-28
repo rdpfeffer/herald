@@ -1,5 +1,7 @@
 from collections import namedtuple
 import shlex
+import subprocess
+import os
 
 DELETED_STATUSES = set("D.|.D|MD|AD|RD|CD|DD|UD|DU".split("|"))
 UNMERGED_STATUSES = set("DD|AA|UU|AU|UD|UA|DU".split("|"))
@@ -18,8 +20,17 @@ class StatusEntry(_StatusEntry):
     def is_submodule(self):
         return self.submodule.startswith("S")
 
+def get_raw_git_status_lines():
+    return subprocess.run(
+        "git status --porcelain=v2".split(" "),
+        check=True,
+        text=True,
+        stdout=subprocess.PIPE
+    ).stdout.split(os.linesep)
+
 
 def main(lines):
+    lines = strip_empty_lines(lines)
     lines = strip_headers(lines)
     status_entries = parse_lines(lines)
     deleted_entries = [l for l in status_entries if l.is_deleted()]
@@ -27,10 +38,16 @@ def main(lines):
     checkable_lines = list(
         set(status_entries) - set(deleted_entries) - set(unmerged_lines)
     )
+    print(checkable_lines)
+
+
+def strip_empty_lines(lines):
+    return [l for l in lines if len(l) > 0]
 
 
 def strip_headers(lines):
     return [l for l in lines if not l.startswith("#")]
+
 
 def parse_lines(lines):
     return [parse(l) for l in lines]
@@ -81,5 +98,6 @@ def parse_unmerged_entry(tokens):
 
 
 if __name__ == "__main__":
-    main()
+    lines = get_raw_git_status_lines()
+    main(lines)
 
