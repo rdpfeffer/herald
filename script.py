@@ -19,7 +19,10 @@ class StatusEntry(_StatusEntry):
         return self.status in UNMERGED_STATUSES
 
     def is_submodule(self):
-        return self.submodule.startswith("S")
+        if self.submodule is None:
+            return False
+        else:
+            return self.submodule.startswith("S")
 
 
 def get_raw_git_status_lines():
