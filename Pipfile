@@ -4,9 +4,15 @@ verify_ssl = true
 name = "pypi"
 
 [packages]
-pytest = "*"
 
 [dev-packages]
+pytest = "*"
+pytest-cov = "*"
+black = "*"
+isort = "*"
 
 [requires]
 python_version = "3.7"
+
+[pipenv]
+allow_prereleases = true
