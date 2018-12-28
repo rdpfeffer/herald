@@ -1,7 +1,7 @@
-from collections import namedtuple
+import os
 import shlex
 import subprocess
-import os
+from collections import namedtuple
 
 DELETED_STATUSES = set("D.|.D|MD|AD|RD|CD|DD|UD|DU".split("|"))
 UNMERGED_STATUSES = set("DD|AA|UU|AU|UD|UA|DU".split("|"))
@@ -11,6 +11,7 @@ _StatusEntry = namedtuple("StatusEntry", ["status", "submodule", "orig_path", "p
 class StatusEntry(_StatusEntry):
 
     """Represents one line of status when running 'git status'"""
+
     def is_deleted(self):
         return self.status in DELETED_STATUSES
 
@@ -20,12 +21,13 @@ class StatusEntry(_StatusEntry):
     def is_submodule(self):
         return self.submodule.startswith("S")
 
+
 def get_raw_git_status_lines():
     return subprocess.run(
         "git status --porcelain=v2".split(" "),
         check=True,
         text=True,
-        stdout=subprocess.PIPE
+        stdout=subprocess.PIPE,
     ).stdout.split(os.linesep)
 
 
@@ -70,8 +72,11 @@ def parse(line):
         return parse_renamed_or_copied_entry(tokens)
     if tokens[0] == "u":
         return parse_unmerged_entry(tokens)
-    raise ValueError("Line given does not match one of the recognized Git "
-                     "Porcelain V2 formats. {}".format(line))
+    raise ValueError(
+        "Line given does not match one of the recognized Git "
+        "Porcelain V2 formats. {}".format(line)
+    )
+
 
 def parse_untracked_ignored_entry(tokens):
     # Handle untracked and ignored files, Porcelain V2 gives single letter
@@ -100,4 +105,3 @@ def parse_unmerged_entry(tokens):
 if __name__ == "__main__":
     lines = get_raw_git_status_lines()
     main(lines)
-
