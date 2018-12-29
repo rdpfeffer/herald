@@ -40,8 +40,12 @@ def main(lines):
     status_entries = parse_lines(lines)
     deleted_entries = [l for l in status_entries if l.is_deleted()]
     unmerged_lines = [l for l in status_entries if l.is_unmerged()]
+    submodule_lines = [l for l in status_entries if l.is_submodule]
     checkable_lines = list(
-        set(status_entries) - set(deleted_entries) - set(unmerged_lines)
+        set(status_entries)
+        - set(deleted_entries)
+        - set(unmerged_lines)
+        - set(submodule_lines)
     )
     print(checkable_lines)
 
