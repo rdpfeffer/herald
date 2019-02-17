@@ -64,14 +64,7 @@ def parse_lines(lines):
 
 
 def parse(line):
-    status = None
-    submodule = None
-    orig_path = None
-    path = None
-    lex = shlex.shlex(line)
-    lex.whitespace_split = True
-    lex.whitespace = " "
-    tokens = list(lex)
+    tokens = tokenize(line)
     if tokens[0] in ("!", "?"):
         return parse_untracked_ignored_entry(tokens)
     if tokens[0] == "1":
@@ -84,6 +77,13 @@ def parse(line):
         "Line given does not match one of the recognized Git "
         "Porcelain V2 formats. {}".format(line)
     )
+
+
+def tokenize(line):
+    lex = shlex.shlex(line)
+    lex.whitespace_split = True
+    lex.whitespace = " "
+    return list(lex)
 
 
 def parse_untracked_ignored_entry(tokens):
