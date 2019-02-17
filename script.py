@@ -1,6 +1,7 @@
 import os
 import shlex
 import subprocess
+import sys
 from collections import namedtuple
 
 DELETED_STATUSES = set("D.|.D|MD|AD|RD|CD|DD|UD|DU".split("|"))
@@ -40,7 +41,7 @@ def main(lines):
     status_entries = parse_lines(lines)
     deleted_entries = [l for l in status_entries if l.is_deleted()]
     unmerged_lines = [l for l in status_entries if l.is_unmerged()]
-    submodule_lines = [l for l in status_entries if l.is_submodule]
+    submodule_lines = [l for l in status_entries if l.is_submodule()]
     checkable_lines = list(
         set(status_entries)
         - set(deleted_entries)
