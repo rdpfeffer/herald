@@ -19,7 +19,7 @@ def test_validate_config():
             "tasks": {"parallel": ["ls -la", "echo something"]},
         },
     }
-    schema.validate_config(example_config)
+    schema.validate(example_config)
 
 
 def test_validate_bad_pattern():
@@ -32,7 +32,7 @@ def test_validate_bad_pattern():
                 "tasks": {"parallel": ["ls -la", "echo something"]},
             }
         }
-        schema.validate_config(example_config)
+        schema.validate(example_config)
 
 
 def test_validate_bad_tasks():
@@ -45,4 +45,4 @@ def test_validate_bad_tasks():
                 "tasks": {"XXXXX": ["ls -la", "echo something"]},
             }
         }
-        schema.validate_config(example_config)
+        schema.validate(example_config)

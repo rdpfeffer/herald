@@ -1,7 +1,7 @@
-from jsonschema import validate
+from jsonschema import validate as _validate
 
 
-def validate_config(instance):
+def validate(instance):
     """Validate that the config is valid
 
     """
@@ -37,4 +37,4 @@ def validate_config(instance):
         },
         "additionalProperties": False,
     }
-    validate(instance=instance, schema=schema)
+    _validate(instance=instance, schema=schema)
