@@ -76,11 +76,14 @@ def test_get_all_task_groups_for_filepaths(basic_config):
     for task_group in task_groups:
         assert task_group._tasks == ("ls -la", "echo something")
 
+
 def test_alternate_matching(basic_config):
     assert False
 
+
 def test_alternative_test_group_creation():
     assert False
+
 
 def test_more_complex_case_with_many_files():
     assert False
