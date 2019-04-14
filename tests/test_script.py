@@ -1,6 +1,7 @@
 from collections import namedtuple
 
-from script import StatusEntry, parse
+from .context import herald
+from herald.script import StatusEntry, parse
 
 Case = namedtuple("Case", ["line", "status_entry", "deleted", "unmerged", "submodule"])
 TEST_CASES = [

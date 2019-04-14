@@ -6,9 +6,9 @@ from operator import itemgetter
 
 import attr
 
-import executor
-import schema
-import task
+from herald import executor
+from herald import schema
+from herald import task
 
 
 def load_config(path=".heraldrc.json"):

@@ -1,8 +1,9 @@
 import pytest
 
-import config
-import executor
-import task
+from .context import herald
+from herald import config
+from herald import executor
+from herald import task
 
 
 @pytest.fixture

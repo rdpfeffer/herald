@@ -1,6 +1,6 @@
 import attr
 
-import executor
+from herald import executor
 
 
 @attr.s(frozen=True)

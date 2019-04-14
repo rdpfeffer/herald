@@ -1,8 +1,9 @@
 import attr
 import pytest
 
-import executor
-import task
+from .context import herald
+from herald import executor
+from herald import task
 
 
 def test_immutable_properties():
