@@ -17,7 +17,7 @@ def basic_config():
             "src/test/java/*.java": {
                 "alternate": "src/main/java/{}.java",
                 "type": "test",
-                "tasks": {"parallel": ["ls -la", "echo something"]},
+                "tasks": {"parallel": ["wc -l", "echo test"]},
             },
         }
     )
@@ -78,7 +78,34 @@ def test_get_all_task_groups_for_filepaths(basic_config):
 
 
 def test_alternate_matching(basic_config):
-    assert False
+    config_map = config.ConfigurationMap
+    cases = [
+        (
+            "src/main/*.java",
+            "src/test/{}.java",
+            "src/main/foo.java",
+            "src/test/foo.java",
+        )
+    ]
+    for pattern, altenate_format, filepath, alternate in cases:
+        assert (
+            config_map._compute_alternate(pattern, altenate_format, filepath)
+            == alternate
+        )
+
+
+def test_first_special_char():
+    config_map = config.ConfigurationMap
+    cases = [("a/b/*.txt", 4), ("a/b/?.txt", 4), ("a/b/[xyz].txt", 4)]
+    for pattern, index in cases:
+        assert config_map._prefix_end(pattern) == index
+
+
+def test_last_special_char():
+    config_map = config.ConfigurationMap
+    cases = [("a/b/*/**.txt", 8), ("a/b/?.txt", 5), ("a/b/[xyz].txt", 9)]
+    for pattern, index in cases:
+        assert config_map._suffix_start(pattern) == index
 
 
 def test_alternative_test_group_creation():

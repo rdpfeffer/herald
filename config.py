@@ -1,5 +1,6 @@
 import fnmatch
 import json
+import re
 from itertools import chain, groupby
 from operator import itemgetter
 
@@ -99,14 +100,36 @@ class ConfigurationMap(object):
             if "alternate" in entry
         ]
 
-    def _compute_alternate(self, pattern, alternate, filepath):
+    @staticmethod
+    def _compute_alternate(pattern, alternate, filepath):
         """Compute the alternate of a given filepath.
 
-       This takes everything between the first and last special character, trimming off either end, and using that as input to the alternate format string."""
-        beggining = pattern[0 : self._first_special_char()]
-        end = pattern[self._last_special_char() :]
+        This takes everything between the first and last special character,
+        trimming off either end, and using that as input to the alternate
+        format string."""
+        beggining = pattern[0 : ConfigurationMap._prefix_end(pattern)]
+        end = pattern[ConfigurationMap._suffix_start(pattern) :]
         middle = filepath[len(beggining) : -len(end)]
         return alternate.format(middle)
+
+    @staticmethod
+    def _prefix_end(pattern):
+        match = ConfigurationMap._get_special_char_match(pattern)
+        if match is not None:
+            return match.span()[0]
+        else:
+            return 0
+
+    @staticmethod
+    def _suffix_start(pattern):
+        reverse = pattern[::-1]
+        index = ConfigurationMap._prefix_end(reverse)
+        return len(pattern) - index
+
+    @staticmethod
+    def _get_special_char_match(pattern):
+        reg = re.compile(r"[\*\?\[\]]")
+        return reg.search(pattern)
 
 
 class InternalExecutorError(Exception):
