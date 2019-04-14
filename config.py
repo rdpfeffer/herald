@@ -45,8 +45,9 @@ class ConfigurationMap(object):
 
     def get_all_task_groups_for_filepaths(self, filepaths):
         task_groups = []
+        all_filepaths = filepaths + self.get_test_alternates(filepaths)
         tasks_and_files = chain(
-            *[self.pair_task_entries_with_filepath(filepath) for filepath in filepaths]
+            *[self.pair_task_entries_with_filepath(filepath) for filepath in all_filepaths]
         )
         for _, group in groupby(tasks_and_files, self._key_for_task_data_entry):
             group = list(group)
@@ -93,12 +94,26 @@ class ConfigurationMap(object):
         else:
             raise InternalExecutorError()
 
-    def get_test_alternates_for_filepath(self, filepath):
-        alternate_paths = [
+    def get_test_alternates(self, filepaths):
+        alternate_filepath_candiddates = [
             self._compute_alternate(pattern, entry["alternate"], filepath)
+            for filepath in filepaths
             for pattern, entry in self._map_filepath_to_config_entries(filepath)
             if "alternate" in entry
         ]
+        return [
+            alt_filepath
+            for alt_filepath in alternate_filepath_candiddates
+            for pattern, entry in self._map_filepath_to_config_entries(alt_filepath)
+            if self._is_test_type(entry["type"])
+        ]
+
+    @staticmethod
+    def _is_test_type(config_type):
+        for test_type in ["test", "spec"]:
+            if test_type in config_type:
+                return True
+        return False
 
     @staticmethod
     def _compute_alternate(pattern, alternate, filepath):
