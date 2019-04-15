@@ -1,7 +1,7 @@
+"""Main Entrypoint for Herald"""
 import os
 import shlex
 import subprocess
-import sys
 from collections import namedtuple
 
 DELETED_STATUSES = set("D.|.D|MD|AD|RD|CD|DD|UD|DU".split("|"))
@@ -20,10 +20,13 @@ class StatusEntry(_StatusEntry):
         return self.status in UNMERGED_STATUSES
 
     def is_submodule(self):
+        """Return True if the status entry is a submdule"""
+        check = False
         if self.submodule is None:
-            return False
+            check = False
         else:
-            return self.submodule.startswith("S")
+            check = self.submodule.startswith("S")
+        return check
 
 
 def get_raw_git_status_lines():
@@ -36,9 +39,8 @@ def get_raw_git_status_lines():
 
 
 def main(lines):
-    lines = strip_empty_lines(lines)
-    lines = strip_headers(lines)
-    status_entries = parse_lines(lines)
+    clean_lines = strip_headers(strip_empty_lines(lines))
+    status_entries = parse_lines(clean_lines)
     deleted_entries = [l for l in status_entries if l.is_deleted()]
     unmerged_lines = [l for l in status_entries if l.is_unmerged()]
     submodule_lines = [l for l in status_entries if l.is_submodule()]
@@ -111,5 +113,4 @@ def parse_unmerged_entry(tokens):
 
 
 if __name__ == "__main__":
-    lines = get_raw_git_status_lines()
-    main(lines)
+    main(get_raw_git_status_lines())

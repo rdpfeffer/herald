@@ -1,8 +1,8 @@
+"""Map and Create Tasks based on the config"""
 import fnmatch
 import json
 import re
 from itertools import chain, groupby
-from operator import itemgetter
 
 import attr
 
@@ -26,12 +26,13 @@ def load_config(path=".heraldrc.json"):
 
 
 @attr.s(frozen=True)
-class MatchPair(object):
+class MatchPair():
+    """group a filepath with configuration task data"""
     filepath = attr.ib()
     task_data = attr.ib()
 
 
-class ConfigurationMap(object):
+class ConfigurationMap():
 
     """Herald Config"""
 
@@ -53,7 +54,7 @@ class ConfigurationMap(object):
             group = list(group)
             pair = group[0]
             task_data = pair.task_data
-            executor_name, tasks = task_data.copy().popitem()
+            executor_name, _ = task_data.copy().popitem()
             file_group = {pair.filepath for pair in group}
             task_groups.append(
                 self._task_group_for_task_entry(executor_name, task_data, file_group)
@@ -82,17 +83,20 @@ class ConfigurationMap(object):
         ]
 
     def _task_group_for_task_entry(self, executor_name, task_data, filepaths):
-        executor = self._executor_for_name(executor_name)
+        executor_instance = self._executor_for_name(executor_name)
         tasks = task_data[executor_name]
-        return task.TaskGroup(executor, tasks, filepaths)
+        return task.TaskGroup(executor_instance, tasks, filepaths)
 
-    def _executor_for_name(self, executor_name):
+    @staticmethod
+    def _executor_for_name(executor_name):
+        executor_instance = None
         if executor_name == "parallel":
-            return executor.ParallelExecutor()
+            executor_instance = executor.ParallelExecutor()
         elif executor_name == "serial":
-            return executor.SerialExecutor()
+            executor_instance = executor.SerialExecutor()
         else:
             raise InternalExecutorError()
+        return executor_instance
 
     def get_test_alternates(self, filepaths):
         alternate_filepath_candiddates = [
@@ -130,10 +134,10 @@ class ConfigurationMap(object):
     @staticmethod
     def _prefix_end(pattern):
         match = ConfigurationMap._get_special_char_match(pattern)
+        end = 0
         if match is not None:
-            return match.span()[0]
-        else:
-            return 0
+            end = match.span()[0]
+        return end
 
     @staticmethod
     def _suffix_start(pattern):

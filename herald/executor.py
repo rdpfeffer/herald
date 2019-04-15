@@ -1,9 +1,13 @@
-class Executor(object):
+"""Responsible for Task Execution"""
+
+
+class Executor:
 
     """Abstract Executor Class"""
 
     def run(self, tasks, filepaths):
-        raise NotImplemented(
+        """Not Implemented"""
+        raise NotImplementedError(
             "Executor is an Abstract class. Please use a concrete "
             "implementation with a properly implemented run() method"
         )
@@ -18,6 +22,7 @@ class SerialExecutor(Executor):
         Executor.__init__(self)
 
     def run(self, tasks, filepaths):
+        """Run the tasks"""
         # TODO: Implement Me
         pass
 
@@ -31,5 +36,6 @@ class ParallelExecutor(Executor):
         Executor.__init__(self)
 
     def run(self, tasks, filepaths):
+        """Run the tasks"""
         # TODO: Implement Me
         pass

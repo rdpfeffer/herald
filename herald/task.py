@@ -1,10 +1,11 @@
+"""This module is responsible for grouping a set of files against a list of tasks to be run"""
 import attr
 
 from herald import executor
 
 
 @attr.s(frozen=True)
-class TaskGroup(object):
+class TaskGroup:
 
     """A group of tasks to be run"""
 
@@ -13,7 +14,10 @@ class TaskGroup(object):
     _filepaths = attr.ib(converter=frozenset)
 
     def copy_with_additional_paths(self, filepaths):
+        """Return a copy of the task group with the union of the provided
+        tasks and the tasks that already exist within this TaskGroup"""
         return TaskGroup(self._executor, self._tasks, self._filepaths.union(filepaths))
 
     def run(self, filepaths):
+        "Execute the provided tasks against the filepaths provided"
         self._executor.run(self._tasks, filepaths)
