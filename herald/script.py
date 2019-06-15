@@ -4,6 +4,8 @@ import shlex
 import subprocess
 from collections import namedtuple
 
+from . import config
+
 DELETED_STATUSES = set("D.|.D|MD|AD|RD|CD|DD|UD|DU".split("|"))
 UNMERGED_STATUSES = set("DD|AA|UU|AU|UD|UA|DU".split("|"))
 _StatusEntry = namedtuple("StatusEntry", ["status", "submodule", "orig_path", "path"])
@@ -38,19 +40,26 @@ def get_raw_git_status_lines():
     ).stdout.split(os.linesep)
 
 
-def main(lines):
+def main(lines, config_map):
+    checkable_lines = get_checkable_lines(lines)
+    filepaths = [l.path for l in checkable_lines]
+    task_groups = config_map.get_all_task_groups_for_filepaths(filepaths)
+    for group in task_groups:
+        group.run()
+
+
+def get_checkable_lines(lines):
     clean_lines = strip_headers(strip_empty_lines(lines))
     status_entries = parse_lines(clean_lines)
     deleted_entries = [l for l in status_entries if l.is_deleted()]
     unmerged_lines = [l for l in status_entries if l.is_unmerged()]
     submodule_lines = [l for l in status_entries if l.is_submodule()]
-    checkable_lines = list(
+    return list(
         set(status_entries)
         - set(deleted_entries)
         - set(unmerged_lines)
         - set(submodule_lines)
     )
-    print(checkable_lines)
 
 
 def strip_empty_lines(lines):
@@ -113,4 +122,4 @@ def parse_unmerged_entry(tokens):
 
 
 if __name__ == "__main__":
-    main(get_raw_git_status_lines())
+    main(get_raw_git_status_lines(), config.load_config())
