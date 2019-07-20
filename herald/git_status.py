@@ -4,7 +4,6 @@ import shlex
 import subprocess
 from collections import namedtuple
 
-from . import config
 
 DELETED_STATUSES = set("D.|.D|MD|AD|RD|CD|DD|UD|DU".split("|"))
 UNMERGED_STATUSES = set("DD|AA|UU|AU|UD|UA|DU".split("|"))
@@ -38,14 +37,6 @@ def get_raw_git_status_lines():
         text=True,
         stdout=subprocess.PIPE,
     ).stdout.split(os.linesep)
-
-
-def main(lines, config_map):
-    checkable_lines = get_checkable_lines(lines)
-    filepaths = [l.path for l in checkable_lines]
-    task_groups = config_map.get_all_task_groups_for_filepaths(filepaths)
-    for group in task_groups:
-        group.run()
 
 
 def get_checkable_lines(lines):
@@ -119,7 +110,3 @@ def parse_renamed_or_copied_entry(tokens):
 def parse_unmerged_entry(tokens):
     _, status, submodule, _, _, _, _, _, _, _, path = tokens
     return StatusEntry(status, submodule, None, path)
-
-
-if __name__ == "__main__":
-    main(get_raw_git_status_lines(), config.load_config())

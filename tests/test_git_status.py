@@ -237,17 +237,12 @@ TEST_CASES = [
         False,
     ),
     Case(
-        '1 .M SC.. 100644 100644 100644 b42d4eff b42d4eff a',
-        StatusEntry(
-            status=".M",
-            orig_path=None,
-            path='a',
-            submodule="SC..",
-        ),
+        "1 .M SC.. 100644 100644 100644 b42d4eff b42d4eff a",
+        StatusEntry(status=".M", orig_path=None, path="a", submodule="SC.."),
         False,
         False,
         True,
-    )
+    ),
 ]
 
 
