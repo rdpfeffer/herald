@@ -26,13 +26,14 @@ def load_config(path=".heraldrc.json"):
 
 
 @attr.s(frozen=True)
-class MatchPair():
+class MatchPair:
     """group a filepath with configuration task data"""
+
     filepath = attr.ib()
     task_data = attr.ib()
 
 
-class ConfigurationMap():
+class ConfigurationMap:
 
     """Herald Config"""
 
@@ -48,7 +49,10 @@ class ConfigurationMap():
         task_groups = []
         all_filepaths = filepaths + self.get_test_alternates(filepaths)
         tasks_and_files = chain(
-            *[self.pair_task_entries_with_filepath(filepath) for filepath in all_filepaths]
+            *[
+                self.pair_task_entries_with_filepath(filepath)
+                for filepath in all_filepaths
+            ]
         )
         for _, group in groupby(tasks_and_files, self._key_for_task_data_entry):
             group = list(group)
