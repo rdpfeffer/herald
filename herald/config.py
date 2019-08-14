@@ -6,9 +6,7 @@ from itertools import chain, groupby
 
 import attr
 
-from herald import executor
-from herald import schema
-from herald import task
+from herald import executor, schema, task
 
 
 def load_config(path=".heraldrc.json"):
@@ -87,20 +85,8 @@ class ConfigurationMap:
         ]
 
     def _task_group_for_task_entry(self, executor_name, task_data, filepaths):
-        executor_instance = self._executor_for_name(executor_name)
         tasks = task_data[executor_name]
-        return task.TaskGroup(executor_instance, tasks, filepaths)
-
-    @staticmethod
-    def _executor_for_name(executor_name):
-        executor_instance = None
-        if executor_name == "parallel":
-            executor_instance = executor.ParallelExecutor()
-        elif executor_name == "serial":
-            executor_instance = executor.SerialExecutor()
-        else:
-            raise InternalExecutorError()
-        return executor_instance
+        return task.TaskGroup(executor_name, tasks, filepaths)
 
     def get_test_alternates(self, filepaths):
         alternate_filepath_candiddates = [
@@ -153,9 +139,3 @@ class ConfigurationMap:
     def _get_special_char_match(pattern):
         reg = re.compile(r"[\*\?\[\]]")
         return reg.search(pattern)
-
-
-class InternalExecutorError(Exception):
-
-    """Thrown when a bad execution mode is supplied. If this error is ever thrown,
-    then then there is some internal error with the program"""

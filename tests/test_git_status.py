@@ -1,7 +1,8 @@
 from collections import namedtuple
 
-from .context import herald
 from herald.git_status import StatusEntry, parse
+
+from .context import herald
 
 Case = namedtuple("Case", ["line", "status_entry", "deleted", "unmerged", "submodule"])
 TEST_CASES = [

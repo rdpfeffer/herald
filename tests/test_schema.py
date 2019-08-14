@@ -3,8 +3,9 @@ import json
 import pytest
 from jsonschema.exceptions import ValidationError
 
-from .context import herald
 from herald import schema
+
+from .context import herald
 
 
 def test_validate_config():

@@ -4,7 +4,6 @@ import shlex
 import subprocess
 from collections import namedtuple
 
-
 DELETED_STATUSES = set("D.|.D|MD|AD|RD|CD|DD|UD|DU".split("|"))
 UNMERGED_STATUSES = set("DD|AA|UU|AU|UD|UA|DU".split("|"))
 _StatusEntry = namedtuple("StatusEntry", ["status", "submodule", "orig_path", "path"])

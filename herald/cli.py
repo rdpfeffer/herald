@@ -1,7 +1,7 @@
 #! /usr/bin/env python
 
-import herald.git_status as git_status
 import herald.config as config
+import herald.git_status as git_status
 
 
 def main(lines, config_map):

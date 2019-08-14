@@ -39,3 +39,20 @@ class ParallelExecutor(Executor):
         """Run the tasks"""
         # TODO: Implement Me
         pass
+
+
+def create_executor(executor_name):
+    executor_instance = None
+    if executor_name == "parallel":
+        executor_instance = ParallelExecutor()
+    elif executor_name == "serial":
+        executor_instance = SerialExecutor()
+    else:
+        raise BadExecutorError()
+    return executor_instance
+
+
+class BadExecutorError(Exception):
+
+    """Thrown when a bad execution mode is supplied. If this error is ever thrown,
+    then there is likely a misspelled/bad config"""
