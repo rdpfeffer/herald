@@ -2,15 +2,21 @@
 
 import herald.config as config
 import herald.git_status as git_status
+from herald.executor import subprocess
 
 
-def main(lines, config_map):
+def main(lines, config_map, create_executor):
     checkable_lines = git_status.get_checkable_lines(lines)
     filepaths = [l.path for l in checkable_lines]
     task_groups = config_map.get_all_task_groups_for_filepaths(filepaths)
     for group in task_groups:
-        group.run()
+        exec = create_executor(group._executor_name)
+        exec.run(group._tasks, group._filepaths)
 
 
 if __name__ == "__main__":
-    main(git_status.get_raw_git_status_lines(), config.load_config())
+    main(
+        git_status.get_raw_git_status_lines(),
+        config.load_config(),
+        subprocess.create_executor,
+    )
