@@ -1,3 +1,6 @@
 .coverage
 *.swo
 cov_html
+.mypy_cache/
+.tox
+*.egg-info
