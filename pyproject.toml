@@ -2,11 +2,14 @@
 name = "herald"
 version = "0.1.0"
 description = "Automatically run tasks based on git status"
+homepage = "https://github.com/rdpfeffer/herald"
+repository = "https://github.com/rdpfeffer/herald"
 authors = ["Ryan Pfeffer <rdpfeffer@gmail.com>"]
 license = "MIT"
+readme = "README.md"
 
 [tool.poetry.dependencies]
-python = "^3.6"
+python = ">=2.7, ^3.6, <4.0"
 attrs = "^19.1"
 jsonschema = "^3.0"
 
@@ -18,6 +21,10 @@ pytest-cov = "^2.7"
 black = {version = "^18.3-alpha.0", allows-prereleases = true}
 mypy = "^0.720.0"
 flake8 = "^3.7"
+tox = "^3.13"
 [build-system]
 requires = ["poetry>=0.12"]
 build-backend = "poetry.masonry.api"
+
+[tool.poetry.scripts]
+herald = 'herald:cli.main'

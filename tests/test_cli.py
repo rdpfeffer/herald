@@ -1,13 +1,11 @@
 import herald.cli as cli
 from herald.executor import noop
 
-from .fixtures import basic_config
 
-
-def test_main(basic_config):
+def test_entrypoint(basic_config):
     output_tasks = []
     with noop.record(output_tasks) as create_executor:
-        cli.main(
+        cli.entrypoint(
             [
                 "1 M. N... 100755 100755 100755 "
                 "275239cf6d3a0de3e59e54e12b31113dc4769941 "

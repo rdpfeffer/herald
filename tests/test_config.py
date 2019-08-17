@@ -1,9 +1,8 @@
 import pytest
 
-from herald import config, executor, task
+from herald import config, task
 
 from .context import herald
-from .fixtures import basic_config
 
 
 def test_task_group_for_task_entry():
