@@ -1,7 +1,6 @@
 import pytest
 
-from herald.executor import base
-from herald.executor import subprocess
+from herald.executor import base, subprocess
 
 from .context import herald
 

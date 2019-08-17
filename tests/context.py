@@ -1,6 +1,6 @@
 import os
 import sys
 
-import herald
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))  # noqa
 
-sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
+import herald  # noqa pylint: disable=unused-import,wrong-import-position; isort:skip

@@ -1,5 +1,4 @@
 import herald.cli as cli
-import herald.config as config
 from herald.executor import noop
 
 from .fixtures import basic_config
