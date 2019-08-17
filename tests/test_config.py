@@ -59,9 +59,9 @@ def test_test_file_does_not_gather_src_files(basic_config):
 
 
 def _verify_task_group_equivalent(task_group, executor_name, tasks, path_set):
-    assert task_group._executor_name == executor_name
-    assert task_group._tasks == tasks
-    assert task_group._filepaths == path_set
+    assert task_group.executor_name == executor_name
+    assert task_group.tasks == tasks
+    assert task_group.filepaths == path_set
 
 
 def test_alternate_matching(basic_config):
