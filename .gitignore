@@ -4,3 +4,4 @@ cov_html
 .mypy_cache/
 .tox
 *.egg-info
+**/__pycache__/*
