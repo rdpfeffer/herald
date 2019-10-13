@@ -1,0 +1,12 @@
+{
+  "herald/**/*.py": {
+    "alternate": "tests/{}_test.py",
+    "type": "source",
+    "tasks": {"serial": []}
+  },
+  "tests/**/*_test.py": {
+    "alternate": "herald/{}.py",
+    "type": "test",
+    "tasks": {"serial": ["pytest {}"]}
+  }
+}
