@@ -9,6 +9,10 @@ import attr
 from herald import executor, schema, task
 
 
+class ConfigFileNotFoundError(FileNotFoundError):
+    pass
+
+
 def load_config(path=".heraldrc.json"):
     """TODO: Docstring for load_config.
 
@@ -16,11 +20,16 @@ def load_config(path=".heraldrc.json"):
     :returns: TODO
 
     """
-    with open(path) as file:
-        lines = file.read()
-        data = json.loads(lines)
-        schema.validate(data)
-        return ConfigurationMap(data)
+    try:
+        with open(path) as file:
+            lines = file.read()
+            data = json.loads(lines)
+            schema.validate(data)
+            return ConfigurationMap(data)
+    except FileNotFoundError as e:
+        raise ConfigFileNotFoundError(
+            "Could not find config file: {}".format(path)
+        ) from e
 
 
 @attr.s(frozen=True)

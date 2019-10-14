@@ -29,13 +29,12 @@ class StatusEntry(_StatusEntry):
         return check
 
 
-def get_raw_git_status_lines():
-    return subprocess.run(
-        "git status --porcelain=v2".split(" "),
-        check=True,
-        text=True,
-        stdout=subprocess.PIPE,
-    ).stdout.split(os.linesep)
+def get_raw_git_status_lines(invoke):
+    cmd = "git status --porcelain=v2"
+    result = invoke.run(cmd, hide=True, warn=True)
+    # TODO: handle when result is not ok
+    if result.ok:
+        return result.stdout.splitlines()
 
 
 def get_checkable_lines(lines):

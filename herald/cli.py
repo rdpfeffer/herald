@@ -3,6 +3,7 @@
 import herald.config as config
 import herald.git_status as git_status
 from herald.executor import subprocess
+import invoke
 
 
 def entrypoint(lines, config_map, create_executor):
@@ -16,7 +17,7 @@ def entrypoint(lines, config_map, create_executor):
 
 def main():
     entrypoint(
-        git_status.get_raw_git_status_lines(),
+        git_status.get_raw_git_status_lines(invoke),
         config.load_config(),
         subprocess.create_executor,
     )

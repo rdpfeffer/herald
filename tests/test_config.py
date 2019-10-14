@@ -2,8 +2,6 @@ import pytest
 
 from herald import config, task
 
-from .context import herald
-
 
 def test_task_group_for_task_entry():
     config_map = config.ConfigurationMap({})
