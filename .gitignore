@@ -6,3 +6,4 @@ cov_html
 *.egg-info
 **/__pycache__/*
 dist/
+Pipfile
