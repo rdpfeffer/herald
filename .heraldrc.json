@@ -1,8 +1,7 @@
 {
   "herald/**.py": {
     "alternate": "tests/{}_test.py",
-    "type": "source",
-    "tasks": {"serial": []}
+    "type": "source"
   },
   "tests/**_test.py": {
     "alternate": "herald/{}.py",

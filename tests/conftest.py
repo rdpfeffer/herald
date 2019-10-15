@@ -31,18 +31,14 @@ def basic_status_lines():
 
 
 @pytest.fixture
-def python_config():
+def missing_task_config():
     return config.ConfigurationMap(
         {
-          "herald/**.py": {
-            "alternate": "tests/{}_test.py",
-            "type": "source",
-            "tasks": {"serial": []}
-          },
-          "tests/**_test.py": {
-            "alternate": "herald/{}.py",
-            "type": "test",
-            "tasks": {"serial": ["pytest {}"]}
-          }
+            "herald/**.py": {"alternate": "tests/{}_test.py", "type": "source"},
+            "tests/**_test.py": {
+                "alternate": "herald/{}.py",
+                "type": "test",
+                "tasks": {"serial": ["pytest {}"]},
+            },
         }
     )

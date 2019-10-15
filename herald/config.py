@@ -84,6 +84,7 @@ class ConfigurationMap:
         return [
             entry["tasks"]
             for _, entry in self._map_filepath_to_config_entries(filepath)
+            if "tasks" in entry
         ]
 
     def _map_filepath_to_config_entries(self, filepath):

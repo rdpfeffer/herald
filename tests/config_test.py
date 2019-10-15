@@ -56,6 +56,26 @@ def test_test_file_does_not_gather_src_files(basic_config):
     )
 
 
+def test_absence_of_tasks_in_config(missing_task_config):
+    task_groups = missing_task_config.get_all_task_groups_for_filepaths(
+        [
+            "herald/cli.py",
+            "poetry.lock",
+            "pyproject.toml",
+            "tests/config_test.py",
+            "tests/conftest.py",
+        ]
+    )
+    assert len(task_groups) == 1
+    _verify_task_group_equivalent(
+        task_groups[0],
+        "serial",
+        ("pytest {}",),
+        {"tests/config_test.py", "tests/cli_test.py"},
+    )
+    pass
+
+
 def _verify_task_group_equivalent(task_group, executor_name, tasks, path_set):
     assert task_group.executor_name == executor_name
     assert task_group.tasks == tasks
