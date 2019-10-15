@@ -28,3 +28,21 @@ def basic_status_lines():
     return [
         "1 M. N... 100755 100755 100755 275239cf6d3a0de3e59e54e12b31113dc4769941 f765280922e5bb1e084650a552c618d19d6794d0 herald/cli.py"
     ]
+
+
+@pytest.fixture
+def python_config():
+    return config.ConfigurationMap(
+        {
+          "herald/**.py": {
+            "alternate": "tests/{}_test.py",
+            "type": "source",
+            "tasks": {"serial": []}
+          },
+          "tests/**_test.py": {
+            "alternate": "herald/{}.py",
+            "type": "test",
+            "tasks": {"serial": ["pytest {}"]}
+          }
+        }
+    )
