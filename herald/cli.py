@@ -15,7 +15,7 @@ def entrypoint(lines, config_map, create_executor):
     task_groups = config_map.get_all_task_groups_for_filepaths(filepaths)
     click.echo("Mapped to task groups: {}".format(task_groups))
     for group in task_groups:
-        executor = create_executor(group.executor_name)
+        executor = create_executor(group.executor_name, invoke)
         executor.run(group.tasks, group.filepaths)
 
 

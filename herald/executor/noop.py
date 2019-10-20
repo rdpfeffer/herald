@@ -10,6 +10,7 @@ class NoopExecutor(base.Executor):
     but doesn't actually run them."""
 
     output_tasks = attr.ib(type=list)
+    invoke = attr.ib()
 
     def run(self, tasks, filepaths):
         """Run the tasks"""
@@ -23,10 +24,10 @@ class record:
     output_tasks = attr.ib(type=list)
 
     def __enter__(self):
-        def create_executor(executor_name):
+        def create_executor(executor_name, invoke):
             executor_instance = None
             if executor_name in ("parallel", "serial"):
-                executor_instance = NoopExecutor(self.output_tasks)
+                executor_instance = NoopExecutor(self.output_tasks, invoke)
             else:
                 raise base.BadExecutorError()
             return executor_instance
