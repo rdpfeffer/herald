@@ -1,5 +1,6 @@
-from herald.executor import base
 import attr
+
+from herald.executor import base
 
 
 @attr.s

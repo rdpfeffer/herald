@@ -1,7 +1,5 @@
 """Main Entrypoint for Herald"""
-import os
 import shlex
-import subprocess
 from collections import namedtuple
 
 DELETED_STATUSES = set("D.|.D|MD|AD|RD|CD|DD|UD|DU".split("|"))

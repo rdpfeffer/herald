@@ -1,10 +1,11 @@
 #! /usr/bin/env python
 
+import click
+import invoke
+
 import herald.config as config
 import herald.git_status as git_status
 from herald.executor import subprocess
-import invoke
-import click
 
 
 def entrypoint(lines, config_map, create_executor):
