@@ -1,5 +1,7 @@
 """Responsible for Task Execution"""
 
+from os import path
+
 
 class Executor:
 
@@ -21,3 +23,9 @@ class BadExecutorError(Exception):
 
 def format_task(task, filepaths):
     return task.format(" ".join(filepaths))
+
+
+def segregate_nonexistent_files(filepaths):
+    non_existent = frozenset([f for f in filepaths if not path.exists(f)])
+    existent = filepaths - non_existent
+    return existent, non_existent

@@ -42,3 +42,49 @@ def missing_task_config():
             },
         }
     )
+
+
+@pytest.fixture
+def everything_exists_path():
+    class Path:
+        @staticmethod
+        def segregate_nonexistent_files(filepaths):
+            return filepaths, frozenset([])
+
+    return Path()
+
+
+@pytest.fixture
+def nothing_exists_path():
+    class Path:
+        @staticmethod
+        def segregate_nonexistent_files(filepaths):
+            return frozenset([]), filepaths
+
+    return Path()
+
+
+@pytest.fixture
+def test_doesnt_exist_path():
+    class Path:
+        @staticmethod
+        def segregate_nonexistent_files(filepaths):
+            return (
+                frozenset([f for f in filepaths if "test" not in f]),
+                frozenset([f for f in filepaths if "test" in f]),
+            )
+
+    return Path()
+
+
+@pytest.fixture
+def source_doesnt_exist_path():
+    class Path:
+        @staticmethod
+        def segregate_nonexistent_files(filepaths):
+            return (
+                frozenset([f for f in filepaths if "test" in f]),
+                frozenset([f for f in filepaths if "test" not in f]),
+            )
+
+    return Path()

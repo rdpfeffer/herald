@@ -1,5 +1,6 @@
 """This module is responsible for grouping a set of files against a list of tasks to be run"""
 import attr
+import enum
 
 from herald import executor
 
@@ -19,3 +20,15 @@ class TaskGroup:
         return TaskGroup(
             self.executor_name, self.tasks, self.filepaths.union(filepaths)
         )
+
+
+class Status(enum.Enum):
+    OK = "ok"
+    ERROR = "error"
+    SKIP = "skip"
+
+
+@attr.s
+class TaskGroupResult:
+    status = attr.ib(validator=attr.validators.in_(Status))
+    results = attr.ib(default=attr.Factory(list))
