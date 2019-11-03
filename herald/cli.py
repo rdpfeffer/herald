@@ -78,7 +78,9 @@ def _run_task_groups(task_groups, logger, create_executor, path_module):
                 )
             group_logger.log("Proceeding with files: {}".format(", ".join(filepaths)))
             executor = create_executor(group.executor_name, invoke, group_logger)
-            results.append(executor.run(group.tasks, filepaths))
+            result = executor.run(group.tasks, filepaths)
+            group_logger.log(result[0])
+            results.append(result)
     return results
 
 

@@ -17,6 +17,7 @@ class NoopExecutor(base.Executor):
         """Run the tasks"""
         for task in tasks:
             self.output_tasks.append(base.format_task(task, filepaths))
+        return self.output_tasks
 
 
 @attr.s
