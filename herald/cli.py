@@ -34,17 +34,24 @@ def _run_task_groups(task_groups, logger, create_executor, path_module):
     results = []
 
     for group in task_groups:
-        logger.log("Handling Task Group: {}".format(group))
         filepaths, non_existent_filepaths = path_module.segregate_nonexistent_files(
             group.filepaths
         )
         if len(filepaths) == 0:
             # TODO: Add name of entry into the formatted string below
-            logger.log("Skipping Task Group: {}, matching alternates do not exist.")
+            logger.log(
+                "Skipping Task Group: {}, matching alternates do not exist.".format(
+                    group.pattern
+                )
+            )
             results.append(task.TaskGroupResult(task.Status.SKIP))
             continue
 
-        logger.log("Redacting alternates not found: {}".format(non_existent_filepaths))
+        logger.log("Handling Task Group: {}".format(group.pattern))
+        if len(non_existent_filepaths) > 0:
+            logger.log(
+                "Redacting alternates not found: {}".format(non_existent_filepaths)
+            )
         executor = create_executor(group.executor_name, invoke, logger)
         results.append(executor.run(group.tasks, filepaths))
     return results

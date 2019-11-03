@@ -10,6 +10,7 @@ class TaskGroup:
 
     """A group of tasks to be run"""
 
+    pattern = attr.ib(type=str)
     executor_name = attr.ib(type=str)
     tasks = attr.ib(converter=tuple)
     filepaths = attr.ib(converter=frozenset)
@@ -18,7 +19,10 @@ class TaskGroup:
         """Return a copy of the task group with the union of the provided
         tasks and the tasks that already exist within this TaskGroup"""
         return TaskGroup(
-            self.executor_name, self.tasks, self.filepaths.union(filepaths)
+            self.pattern,
+            self.executor_name,
+            self.tasks,
+            self.filepaths.union(filepaths),
         )
 
 

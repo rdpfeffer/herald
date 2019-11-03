@@ -33,10 +33,11 @@ def load_config(path=".heraldrc.json"):
 
 
 @attr.s(frozen=True)
-class MatchPair:
+class ConfigMatch:
     """group a filepath with configuration task data"""
 
     filepath = attr.ib()
+    pattern = attr.ib()
     task_data = attr.ib()
 
 
@@ -57,33 +58,39 @@ class ConfigurationMap:
         all_filepaths = filepaths + self.get_test_alternates(filepaths)
         tasks_and_files = chain(
             *[
-                self.pair_task_entries_with_filepath(filepath)
+                self.match_task_entries_with_filepath(filepath)
                 for filepath in all_filepaths
             ]
         )
         for _, group in groupby(tasks_and_files, self._key_for_task_data_entry):
             group = list(group)
-            pair = group[0]
-            task_data = pair.task_data
+            match = group[0]
+            pattern = match.pattern
+            task_data = match.task_data
             executor_name, _ = task_data.copy().popitem()
-            file_group = {pair.filepath for pair in group}
+            file_group = {match.filepath for match in group}
             task_groups.append(
-                self._task_group_for_task_entry(executor_name, task_data, file_group)
+                self._task_group_for_task_entry(
+                    pattern, executor_name, task_data, file_group
+                )
             )
         return task_groups
 
-    def pair_task_entries_with_filepath(self, filepath):
+    def match_task_entries_with_filepath(self, filepath):
         task_data_entries = self._map_filepath_to_task_data_entries(filepath)
-        return [MatchPair(filepath, entry) for entry in task_data_entries]
+        return [
+            ConfigMatch(filepath, pattern, entry)
+            for pattern, entry in task_data_entries
+        ]
 
     @staticmethod
-    def _key_for_task_data_entry(entry_pair):
-        return str(entry_pair.task_data)
+    def _key_for_task_data_entry(entry_match):
+        return str(entry_match.task_data)
 
     def _map_filepath_to_task_data_entries(self, filepath):
         return [
-            entry["tasks"]
-            for _, entry in self._map_filepath_to_config_entries(filepath)
+            (pattern, entry["tasks"])
+            for pattern, entry in self._map_filepath_to_config_entries(filepath)
             if "tasks" in entry
         ]
 
@@ -94,9 +101,9 @@ class ConfigurationMap:
             if fnmatch.fnmatch(filepath, pattern)
         ]
 
-    def _task_group_for_task_entry(self, executor_name, task_data, filepaths):
+    def _task_group_for_task_entry(self, pattern, executor_name, task_data, filepaths):
         tasks = task_data[executor_name]
-        return task.TaskGroup(executor_name, tasks, filepaths)
+        return task.TaskGroup(pattern, executor_name, tasks, filepaths)
 
     def get_test_alternates(self, filepaths):
         alternate_filepath_candiddates = [

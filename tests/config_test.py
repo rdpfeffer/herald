@@ -6,7 +6,7 @@ from herald import config, task
 def test_task_group_for_task_entry():
     config_map = config.ConfigurationMap({})
     task_group = config_map._task_group_for_task_entry(
-        "parallel", {"parallel": ["foo"]}, "a/b/c.txt"
+        "a/b/*.java", "parallel", {"parallel": ["foo"]}, "a/b/c.txt"
     )
     assert isinstance(task_group, task.TaskGroup)
 
@@ -27,7 +27,9 @@ def test_map_filepath_to_config_entries(basic_config):
 
 def test_map_filepath_to_task_data_entries(basic_config):
     entries = basic_config._map_filepath_to_task_data_entries("src/main/java/foo.java")
-    assert entries == [{"serial": ["ls -la", "echo something"]}]
+    assert entries == [
+        ("src/main/java/*.java", {"serial": ["ls -la", "echo something"]})
+    ]
 
 
 def test_get_all_task_groups_for_filepaths(basic_config):
