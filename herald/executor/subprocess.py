@@ -16,7 +16,7 @@ class SerialExecutor(base.Executor):
         results = []
         for task in tasks:
             command = base.format_task(task, filepaths)
-            self.logger.log("Running: {}".format(command))
+            self.logger.log("Running: <info>{}</>".format(command))
             results.append(self.invoke.run(command, warn=True, hide=True, pty=True))
         return results
 

@@ -1,3 +1,4 @@
+import clikit
 import herald.cli as cli
 from herald.executor import noop
 
@@ -25,6 +26,8 @@ def test_entrypoint_when_test_files_missing(basic_config, test_doesnt_exist_path
 def _run_tasks(config, path):
     output_tasks = []
     with noop.record(output_tasks) as create_executor:
+        io = clikit.io.null_io.NullIO()
+        logger  = cli.CliLogger(io)
         cli.entrypoint(
             [
                 "1 M. N... 100755 100755 100755 "
@@ -35,5 +38,6 @@ def _run_tasks(config, path):
             config,
             create_executor,
             path,
+            logger,
         )
     return output_tasks

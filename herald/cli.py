@@ -1,6 +1,6 @@
 #! /usr/bin/env python
 
-import click
+import clikit
 import invoke
 import attr
 
@@ -15,11 +15,16 @@ from contextlib import contextmanager
 @attr.s()
 class CliLogger:
 
+    io = attr.ib()
     indent_level = attr.ib(default=0)
 
     def log(self, message):
         indent_str = self._padd_indent()
-        click.echo("{}{}".format(indent_str, message))
+        self.io.write_line("{}{}".format(indent_str, message))
+
+    def warn(self, message):
+        indent_str = self._padd_indent()
+        self.io.write_line("{}{}".format(indent_str, message))
 
     @contextmanager
     def indent(self, increment=1):
@@ -31,21 +36,22 @@ class CliLogger:
             self.indent_level = previous_indent
 
     def _padd_indent(self):
-        return "    " * self.indent_level
+        return "    " * self.indent_level + "→ " if self.indent_level > 0 else ""
 
 
-def entrypoint(lines, config_map, create_executor, path_module):
-    logger = CliLogger()
+def entrypoint(lines, config_map, create_executor, path_module, logger):
+    logger.log("<info>Analyzing Project State</info>")
 
-    logger.log("Reading Git status")
-    checkable_lines = git_status.get_checkable_lines(lines)
-    filepaths = [l.path for l in checkable_lines]
-    logger.log("Found {} checkable files.".format(len(filepaths)))
+    with logger.indent() as status_logger:
+        status_logger.log("Reading Git status")
+        checkable_lines = git_status.get_checkable_lines(lines)
+        filepaths = [l.path for l in checkable_lines]
+        status_logger.log("Found <info>{}</info> checkable files.".format(len(filepaths)))
 
-    task_groups = config_map.get_all_task_groups_for_filepaths(filepaths)
-    logger.log(
-        "Mapped to task groups: {}".format(",".join([g.pattern for g in task_groups]))
-    )
+        task_groups = config_map.get_all_task_groups_for_filepaths(filepaths)
+        status_logger.log(
+            "Mapped to task groups: <info>{}</info>".format(",".join([g.pattern for g in task_groups]))
+        )
 
     results = _run_task_groups(task_groups, logger, create_executor, path_module)
     _summarize_results(results)
@@ -59,24 +65,22 @@ def _run_task_groups(task_groups, logger, create_executor, path_module):
             group.filepaths
         )
         if len(filepaths) == 0:
-            # TODO: Add name of entry into the formatted string below
             logger.log(
-                "Skipping Task Group: {}, matching alternates do not exist.".format(
+                "Skipping Task Group: <c2>{}</>, matching alternates do not exist.".format(
                     group.pattern
                 )
             )
             results.append(task.TaskGroupResult(task.Status.SKIP))
             continue
 
-        logger.log("Handling Task Group: {}".format(group.pattern))
+        logger.log("<info>Handling Task Group</>: <info>{}</info>".format(group.pattern))
         with logger.indent() as group_logger:
             if len(non_existent_filepaths) > 0:
                 group_logger.log(
-                    "Redacting alternates not found: {}".format(
+                    "Redacting alternates not found: <c2>{}</>".format(
                         ", ".join(non_existent_filepaths)
                     )
                 )
-            group_logger.log("Proceeding with files: {}".format(", ".join(filepaths)))
             executor = create_executor(group.executor_name, invoke, group_logger)
             result = executor.run(group.tasks, filepaths)
             group_logger.log(result[0])
@@ -90,11 +94,16 @@ def _summarize_results(results):
 
 
 def main():
+
+    io = clikit.io.console_io.ConsoleIO()
+    logger = CliLogger(io)
+
     entrypoint(
         git_status.get_raw_git_status_lines(invoke),
         config.load_config(),
         subprocess.create_executor,
         path,
+        logger,
     )
 
 
