@@ -40,17 +40,17 @@ class CliLogger:
 
 
 def entrypoint(lines, config_map, create_executor, path_module, logger):
-    logger.log("<info>Analyzing Project State</info>")
+    logger.log("<c2>Analyzing Project State</c2>")
 
     with logger.indent() as status_logger:
-        status_logger.log("Reading Git status")
+        status_logger.log("<fg=blue>Reading Git status</>")
         checkable_lines = git_status.get_checkable_lines(lines)
         filepaths = [l.path for l in checkable_lines]
-        status_logger.log("Found <info>{}</info> checkable files.".format(len(filepaths)))
+        status_logger.log("<fg=blue>Found <info>{}</info> checkable files.</>".format(len(filepaths)))
 
         task_groups = config_map.get_all_task_groups_for_filepaths(filepaths)
         status_logger.log(
-            "Mapped to task groups: <info>{}</info>".format(",".join([g.pattern for g in task_groups]))
+            "<fg=blue>Mapped to task groups: <info>{}</info></>".format(",".join([g.pattern for g in task_groups]))
         )
 
     results = _run_task_groups(task_groups, logger, create_executor, path_module)
@@ -73,7 +73,7 @@ def _run_task_groups(task_groups, logger, create_executor, path_module):
             results.append(task.TaskGroupResult(task.Status.SKIP))
             continue
 
-        logger.log("<info>Handling Task Group</>: <info>{}</info>".format(group.pattern))
+        logger.log("<c2>Handling Task Group</>: <info>{}</info>".format(group.pattern))
         with logger.indent() as group_logger:
             if len(non_existent_filepaths) > 0:
                 group_logger.log(
