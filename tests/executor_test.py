@@ -11,15 +11,15 @@ def test_abstract_executor_throws_exception():
 
 
 def test_executor_creation_serial():
-    serial_exec = subprocess.create_executor("serial", None, None)
+    serial_exec = subprocess.create_executor("serial", None)
     assert isinstance(serial_exec, subprocess.SerialExecutor)
 
 
 def test_executor_creation_parallel():
-    parallel_exec = subprocess.create_executor("parallel", None, None)
+    parallel_exec = subprocess.create_executor("parallel", None)
     assert isinstance(parallel_exec, subprocess.ParallelExecutor)
 
 
 def test_executor_creation_internal_error():
     with pytest.raises(base.BadExecutorError):
-        subprocess.create_executor("bananas", None, None)
+        subprocess.create_executor("bananas", None)

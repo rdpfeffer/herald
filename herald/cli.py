@@ -1,42 +1,14 @@
 #! /usr/bin/env python
 
+from contextlib import contextmanager
+
 import clikit
 import invoke
-import attr
 
 import herald.config as config
 import herald.git_status as git_status
-from herald import path
+from herald import logging, path, task
 from herald.executor import subprocess
-from herald import task
-from contextlib import contextmanager
-
-
-@attr.s()
-class CliLogger:
-
-    io = attr.ib()
-    indent_level = attr.ib(default=0)
-
-    def log(self, message):
-        indent_str = self._padd_indent()
-        self.io.write_line("{}{}".format(indent_str, message))
-
-    def warn(self, message):
-        indent_str = self._padd_indent()
-        self.io.write_line("{}{}".format(indent_str, message))
-
-    @contextmanager
-    def indent(self, increment=1):
-        previous_indent = self.indent_level
-        self.indent_level += increment
-        try:
-            yield self
-        finally:
-            self.indent_level = previous_indent
-
-    def _padd_indent(self):
-        return "    " * self.indent_level + "→ " if self.indent_level > 0 else ""
 
 
 def entrypoint(lines, config_map, create_executor, path_module, logger):
@@ -46,57 +18,48 @@ def entrypoint(lines, config_map, create_executor, path_module, logger):
         status_logger.log("<fg=blue>Reading Git status</>")
         checkable_lines = git_status.get_checkable_lines(lines)
         filepaths = [l.path for l in checkable_lines]
-        status_logger.log("<fg=blue>Found <info>{}</info> checkable files.</>".format(len(filepaths)))
+        status_logger.log(
+            "<fg=blue>Found <info>{}</info> checkable files.</>".format(len(filepaths))
+        )
 
         task_groups = config_map.get_all_task_groups_for_filepaths(filepaths)
         status_logger.log(
-            "<fg=blue>Mapped to task groups: <info>{}</info></>".format(",".join([g.pattern for g in task_groups]))
+            "<fg=blue>Mapped to task groups: <info>{}</info></>".format(
+                ",".join([g.pattern for g in task_groups])
+            )
         )
 
-    results = _run_task_groups(task_groups, logger, create_executor, path_module)
-    _summarize_results(results)
+    result_summaries = _run_task_groups(
+        task_groups, logger, create_executor, path_module
+    )
+    _summarize_results(result_summaries, logger)
 
 
 def _run_task_groups(task_groups, logger, create_executor, path_module):
-    results = []
+    result_summaries = []
 
     for group in task_groups:
-        filepaths, non_existent_filepaths = path_module.segregate_nonexistent_files(
-            group.filepaths
-        )
-        if len(filepaths) == 0:
-            logger.log(
-                "Skipping Task Group: <c2>{}</>, matching alternates do not exist.".format(
-                    group.pattern
-                )
-            )
-            results.append(task.TaskGroupResult(task.Status.SKIP))
-            continue
+        executor = create_executor(group.executor_name, invoke)
+        result_summaries.append(group.run(path_module, logger, executor))
 
-        logger.log("<c2>Handling Task Group</>: <info>{}</info>".format(group.pattern))
-        with logger.indent() as group_logger:
-            if len(non_existent_filepaths) > 0:
-                group_logger.log(
-                    "Redacting alternates not found: <c2>{}</>".format(
-                        ", ".join(non_existent_filepaths)
-                    )
-                )
-            executor = create_executor(group.executor_name, invoke, group_logger)
-            result = executor.run(group.tasks, filepaths)
-            group_logger.log(result[0])
-            results.append(result)
-    return results
+    return result_summaries
 
 
-def _summarize_results(results):
-    # TODO: Summarize the results
-    pass
+def _summarize_results(result_summaries, logger):
+    logger.log("<c2>Result Summary:</>")
+    with logger.indent() as summary_logger:
+        for summary in result_summaries:
+            if summary.status == task.Status.OK:
+                summary_logger.log("<info>OK</>: {}".format(summary.pattern))
+            elif summary.status == task.Status.ERROR:
+                summary_logger.log("<error>ERROR</>: {}".format(summary.pattern))
+                for result in summary.results:
+                    summary_logger.log(result.stdout)
 
 
 def main():
 
-    io = clikit.io.console_io.ConsoleIO()
-    logger = CliLogger(io)
+    logger = logging.console_logger()
 
     entrypoint(
         git_status.get_raw_git_status_lines(invoke),

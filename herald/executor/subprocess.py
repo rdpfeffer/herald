@@ -9,14 +9,13 @@ class SerialExecutor(base.Executor):
     """A concrete Executor which runs tasks in serial"""
 
     invoke = attr.ib()
-    logger = attr.ib()
 
-    def run(self, tasks, filepaths):
+    def run(self, tasks, filepaths, logger):
         """Run the tasks"""
         results = []
         for task in tasks:
             command = base.format_task(task, filepaths)
-            self.logger.log("Running: <info>{}</>".format(command))
+            logger.log("Running: <info>{}</>".format(command))
             results.append(self.invoke.run(command, warn=True, hide=True, pty=True))
         return results
 
@@ -27,19 +26,18 @@ class ParallelExecutor(base.Executor):
     """A concrete Executor which runs tasks in parallel"""
 
     invoke = attr.ib()
-    logger = attr.ib()
 
-    def run(self, tasks, filepaths):
+    def run(self, tasks, filepaths, logger):
         """Run the tasks"""
         # TODO: Implement Me
 
 
-def create_executor(executor_name, invoke, logger):
+def create_executor(executor_name, invoke):
     executor_instance = None
     if executor_name == "parallel":
-        executor_instance = ParallelExecutor(invoke, logger)
+        executor_instance = ParallelExecutor(invoke)
     elif executor_name == "serial":
-        executor_instance = SerialExecutor(invoke, logger)
+        executor_instance = SerialExecutor(invoke)
     else:
         raise base.BadExecutorError()
     return executor_instance

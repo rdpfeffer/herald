@@ -1,8 +1,9 @@
-"""This module is responsible for grouping a set of files against a list of tasks to be run"""
-import attr
+"""
+This module is responsible for grouping a set of files against a list of tasks to be run
+"""
 import enum
 
-from herald import executor
+import attr
 
 
 @attr.s(frozen=True)
@@ -25,6 +26,34 @@ class TaskGroup:
             self.filepaths.union(filepaths),
         )
 
+    def run(self, path_module, logger, executor):
+        """Run the task group
+        :returns: TODO
+
+        """
+        filepaths, non_existent_filepaths = path_module.segregate_nonexistent_files(
+            self.filepaths
+        )
+        if len(filepaths) == 0:
+            return TaskGroupResultSummary(
+                self.pattern, Status.SKIP, [], "Target files do not exist."
+            )
+
+        logger.log("<c2>Handling Task Group</>: <info>{}</info>".format(self.pattern))
+        with logger.indent() as group_logger:
+            if len(non_existent_filepaths) > 0:
+                group_logger.log(
+                    "Redacting alternates not found: <c2>{}</>".format(
+                        ", ".join(non_existent_filepaths)
+                    )
+                )
+            task_group_results = executor.run(self.tasks, filepaths, group_logger)
+            return TaskGroupResultSummary(
+                self.pattern,
+                Status.OK if all(r.ok for r in task_group_results) else Status.ERROR,
+                task_group_results,
+            )
+
 
 class Status(enum.Enum):
     OK = "ok"
@@ -33,6 +62,8 @@ class Status(enum.Enum):
 
 
 @attr.s
-class TaskGroupResult:
+class TaskGroupResultSummary:
+    pattern = attr.ib(type=str)
     status = attr.ib(validator=attr.validators.in_(Status))
     results = attr.ib(default=attr.Factory(list))
+    message = attr.ib(default="")
